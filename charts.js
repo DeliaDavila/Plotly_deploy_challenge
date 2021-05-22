@@ -60,67 +60,66 @@ function buildCharts(sample) {
     // 3. Create a variable that holds the samples array. 
     var samplesArray = data.samples;
 
-  //why line 61 when I get results printed to the console below here?
-
     // 4. Create a variable that filters the samples for the object with the desired sample number.
     var resultArray = samplesArray.filter(sampleObj => sampleObj.id == sample);
 
     //  5. Create a variable that holds the first sample in the array.
     var result = resultArray[0];
     
-    //console.log("in build charts....result: ")
-    //console.log(result);
+    // console.log("in build charts....result: ")
+    // console.log(result);
 
     // 6. Create variables that hold the otu_ids, otu_labels, and sample_values.
 
-    //BASIC VALUES
+    // otu_ids = result.otu_ids;
+    // otu_labels = result.otu_labels;
+    // sample_values = result.sample_values;
 
-    otu_ids = result.otu_ids;
-    otu_labels = result.otu_labels;
-    sample_values = result.sample_values;
+    //changing to JS case
+    otuIds = result.otu_ids;
+    otuLabels = result.otu_labels;
+    sampleValues = result.sample_values;
 
-    // console.log(sample_values)
 
     //ADJUSTED VALUES
     //Use slice(), map(), reverse() to retrieve the top 10 otu_ids and sort them in descending order.
 
-    var Chart_otu_ids = otu_ids.slice(0,10).map(x => "OTU " + x).reverse();
-    // var Chart_otu_ids = otu_ids.reverse().slice(0,10).map(x => "OTU " + x);
+    //1.IDs / y axis:
 
-    // console.log(Chart_otu_ids);
+    //var Chart_otu_ids = otu_ids.slice(0, 10).map(x => `OTU ${x}`).reverse();
+    var topTenIds = otuIds.slice(0, 10).map(x => `OTU ${x}`).reverse();
+    // console.log(topTen_otu_ids);
 
-    var Chart_otu_labels = otu_labels.slice(0,10).reverse();
-    // var Chart_otu_labels = otu_labels.reverse().slice(0,10);
-    
-    // console.log(Chart_otu_labels);
+    //hover text:
 
-    var Chart_sample_values = sample_values.slice(0,10).reverse();
-    //var Chart_sample_values = sample_values.reverse().slice(0,10);
-    //var Chart_sample_values = sample_values.slice(0,10);
-    //console.log(Chart_sample_values);
+    //var Chart_otu_labels = otu_labels.slice(0,10).reverse();
+    var topTenLabels = otuLabels.slice(0,10).reverse();
+    // console.log(topTen_otu_labels);
+
+    //var Chart_sample_values = sample_values.slice(0,10).reverse(); 
+    var topTenSampleValues = sampleValues.slice(0,10).reverse();
+    // console.log(Chart_sample_values);
 
 
     // 7. Create the yticks for the bar chart.
-    // Hint: Get the the top 10 otu_ids and map them in descending order  
-    //  so the otu_ids with the most bacteria are last. 
+    // Hint: map top 10 otu_ids in descending order: otu_ids with the most bacteria are last. 
 
-
-    // var yticks = otu_ids.slice(0,10).reverse.map(otu_ids);
-    //var yticks = otu_ids.slice(0,10).reverse();
-    //var yticks = Chart_otu_ids;
-    
-    //console.log(yticks);
-
+    // var yticks = otu_ids.slice(0, 10).map(x => `OTU ${x}`).reverse();
+    //Why necessary? It's the same as topTen otu ids.
+    var yticks = topTenIds;
 
     // 8. Create the trace for the bar chart. 
 
-    var barData = {
-      x: Chart_sample_values, 
-      y: Chart_otu_ids,
-      // yticks: yticks,
+    var barTrace = {
+      x: topTenSampleValues,
+      y: topTenIds,
+      yticks: yticks,
       type: "bar",
-      hovertext: Chart_otu_labels,
+      orientation: 'h',
+      hovertext: topTenLabels,
     };
+
+    var barData = [barTrace];
 
     // console.log("bar data")
     // console.log(barData)
@@ -129,24 +128,91 @@ function buildCharts(sample) {
     // 9. Create the layout for the bar chart. 
     var barLayout = {
       title: 'Top Ten Bacteria Cultures Found',
-     // type: "bar",
-      barmode: 'stack',
-      orientation: 'h',
     };
     // 10. Use Plotly to plot the data with the layout. 
     
-    Plotly.newPlot('bar', barData, barLayout);
-    //Plotly.restyle('bar', barData, barLayout);
+    Plotly.newPlot("bar", barData, barLayout);
 
-    // Ploty.restyle will update traces objects.
-    // Plotly.relayout will update layout objects.
 
-    //Plotly.redraw?
 
-    //example: Plotly.newPlot(graphDiv, data, layout, config)
-    //example: (defaults to {data: [], layout: {}, config: {}, frames: []})
+
+//bubble chart
+    // To create the trace object for the bubble chart in Step 1, 
+    // assign the otu_ids, sample_values, and otu_labels to the x, y, and text properties, respectively.
+    //  For the mode and marker properties, the mode is "markers" and the 
+    //  marker property is a dictionary that defines the size, color, and colorscale of the markers.
+
+        //variables
+        // otuIds = result.otu_ids;
+        // otuLabels = result.otu_labels;
+        // sampleValues = result.sample_values;
+
+    // HINT: trace object for bubble chart 
+    // Using d3.select(), select the element that has changed and 
+    // retrieve the property and HTML id that have changed
+
+    // 1. Create the trace for the bubble chart. Trying [{}] to skip step of trace then data=trace
+    var bubbleTrace = {
+      x: otuIds,
+      y: sampleValues,
+      text: otuLabels,
+      mode: "markers",
+      marker: {
+        size: sampleValues,
+        //colors don't match the example
+        color: otuIds,
+        colorscale: otuIds,
+             //top ten makes them all gray
+             // color: topTenIds,
+             // colorscale: topTenIds,
+        //color: otuIds.reverse(),
+        //colorscale: ,
+      },
+    };
+
+    var bubbleData = [bubbleTrace];
+
+    // Sets the otu_ids as the x-axis values
+    // Sets the sample_values as the y-axis values
+    // Sets the otu_labels as the hover-text values
+    // Sets the sample_values as the marker size
+    // Sets the otu_ids as the marker colors
+
+
+
+
+
+    // To create the layout for the bubble chart in Step 2, add a title, a label for the x-axis, margins, 
+    // and the hovermode property. 
+    // The hovermode should show the text of the bubble on the chart when you hover near that bubble.
+
+    // Creates a title
+    // Creates a label for the x-axis
+    // The text for a bubble is shown when hovered over
+
+    // 2. Create the layout for the bubble chart.
+    var bubbleLayout = {
+      title: "Bacteria Cultures per Sample",
+      // xaxis.title: "IDs", //broke the page
+      //xaxis: "IDs", //didn't load bublle
+      xaxis: otuIds,
+          // x axis formatting? Ah. They appear on hover
+
+      hoverlabel: otuLabels,
+      
+    };
+
+    // 3. Use Plotly to plot the data with the layout.
+ 
+    Plotly.newPlot("bubble", bubbleData, bubbleLayout);
+    
 
 })};
+
+
+
+
+
 
 
 
