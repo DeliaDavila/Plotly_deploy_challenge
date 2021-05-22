@@ -122,13 +122,14 @@ function buildCharts(sample) {
       hovertext: Chart_otu_labels,
     };
 
-    console.log("bar data")
-    console.log(barData)
+    // console.log("bar data")
+    // console.log(barData)
 
 //sample_values:  values, the otu_ids: labels, otu_labels: hover text for the bars on the chart.
     // 9. Create the layout for the bar chart. 
     var barLayout = {
       title: 'Top Ten Bacteria Cultures Found',
+     // type: "bar",
       barmode: 'stack',
       orientation: 'h',
     };
