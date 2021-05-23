@@ -77,7 +77,7 @@ function buildCharts(sample) {
     // console.log(metaDataResult.wfreq)
 
     // G3. Create a variable for washing frequency as a floating point number
-    var wfreq = metaDataResult.wfreq
+    var wfreq = parseFloat(metaDataResult.wfreq)
 
     //B6. Create variables that hold the otu_ids, otu_labels, and sample_values.
 
@@ -155,6 +155,7 @@ function buildCharts(sample) {
     var bubbleLayout = {
       title: "<b>Bacteria Cultures per Sample</b>",
       xaxis: otuIds,
+      xaxis: {title: "OTU IDs"},
       hoverlabel: otuLabels,
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "palegreen"
@@ -191,12 +192,6 @@ function buildCharts(sample) {
     // 5. Create the layout for the gauge chart.
     var gaugeLayout = { 
       paper_bgcolor: "rgba(0,0,0,0)",
-      // width: 100%,
-      // height: 0,
-      // padding-bottom: 50%, 
-      // width: 600, 
-      // height: 500, 
-      //margin: { t: 0, b: 0 }
     };
 
     // 6. Use Plotly to plot the gauge data and layout.
