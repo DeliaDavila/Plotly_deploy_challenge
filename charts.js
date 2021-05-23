@@ -53,27 +53,33 @@ function buildMetadata(sample) {
   });
 }
 
-// 1. Create the buildCharts function.
+// B1. Create the buildCharts function.
 function buildCharts(sample) {
-  // 2. Use d3.json to load and retrieve the samples.json file 
+  // B2. Use d3.json to load and retrieve the samples.json file 
   d3.json("samples.json").then((data) => {
-    // 3. Create a variable that holds the samples array. 
+    // B3. Create a variable that holds the samples array. 
     var samplesArray = data.samples;
 
-    // 4. Create a variable that filters the samples for the object with the desired sample number.
+    // B4. Create a variable that filters the samples for the object with the desired sample number.
     var resultArray = samplesArray.filter(sampleObj => sampleObj.id == sample);
 
-    //  5. Create a variable that holds the first sample in the array.
+    // G1. Create a variable that filters the metadata array for the object with the desired sample number.
+    var metadata = data.metadata; //need to var it again or can you just call it since it's var not let?
+    var metaDataResultArray = metadata.filter(sampleObj => sampleObj.id == sample);
+
+    //  B5. Create a variable that holds the first sample in the array.
     var result = resultArray[0];
     
-    // console.log("in build charts....result: ")
-    // console.log(result);
+    // G2. Create a variable that holds the first sample in the metadata array.
+    var metaDataResult = metaDataResultArray[0];
+    // console.log("meta data")
+    // console.log(metaDataResult)
+    // console.log(metaDataResult.wfreq)
 
-    // 6. Create variables that hold the otu_ids, otu_labels, and sample_values.
+    // G3. Create a variable for washing frequency as a floating point number
+    var wfreq = metaDataResult.wfreq
 
-    // otu_ids = result.otu_ids;
-    // otu_labels = result.otu_labels;
-    // sample_values = result.sample_values;
+    //B6. Create variables that hold the otu_ids, otu_labels, and sample_values.
 
     //changing to JS case
     otuIds = result.otu_ids;
@@ -85,27 +91,18 @@ function buildCharts(sample) {
     //Use slice(), map(), reverse() to retrieve the top 10 otu_ids and sort them in descending order.
 
     //1.IDs / y axis:
-
-    //var Chart_otu_ids = otu_ids.slice(0, 10).map(x => `OTU ${x}`).reverse();
     var topTenIds = otuIds.slice(0, 10).map(x => `OTU ${x}`).reverse();
     // console.log(topTen_otu_ids);
 
     //hover text:
-
-    //var Chart_otu_labels = otu_labels.slice(0,10).reverse();
     var topTenLabels = otuLabels.slice(0,10).reverse();
     // console.log(topTen_otu_labels);
 
-    //var Chart_sample_values = sample_values.slice(0,10).reverse(); 
     var topTenSampleValues = sampleValues.slice(0,10).reverse();
     // console.log(Chart_sample_values);
 
 
     // 7. Create the yticks for the bar chart.
-    // Hint: map top 10 otu_ids in descending order: otu_ids with the most bacteria are last. 
-
-    // var yticks = otu_ids.slice(0, 10).map(x => `OTU ${x}`).reverse();
-    //Why necessary? It's the same as topTen otu ids.
     var yticks = topTenIds;
 
     // 8. Create the trace for the bar chart. 
@@ -124,32 +121,18 @@ function buildCharts(sample) {
     // console.log("bar data")
     // console.log(barData)
 
-//sample_values:  values, the otu_ids: labels, otu_labels: hover text for the bars on the chart.
     // 9. Create the layout for the bar chart. 
     var barLayout = {
-      title: 'Top Ten Bacteria Cultures Found',
+      title: '<b>Top Ten Bacteria Cultures Found</b>',
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "palegreen"
     };
+
     // 10. Use Plotly to plot the data with the layout. 
-    
-    Plotly.newPlot("bar", barData, barLayout);
+    Plotly.newPlot("bar", barData, barLayout, {responsive: true});
 
 
-
-
-//bubble chart
-    // To create the trace object for the bubble chart in Step 1, 
-    // assign the otu_ids, sample_values, and otu_labels to the x, y, and text properties, respectively.
-    //  For the mode and marker properties, the mode is "markers" and the 
-    //  marker property is a dictionary that defines the size, color, and colorscale of the markers.
-
-        //variables
-        // otuIds = result.otu_ids;
-        // otuLabels = result.otu_labels;
-        // sampleValues = result.sample_values;
-
-    // HINT: trace object for bubble chart 
-    // Using d3.select(), select the element that has changed and 
-    // retrieve the property and HTML id that have changed
+    //bubble chart
 
     // 1. Create the trace for the bubble chart. Trying [{}] to skip step of trace then data=trace
     var bubbleTrace = {
@@ -159,53 +142,66 @@ function buildCharts(sample) {
       mode: "markers",
       marker: {
         size: sampleValues,
-        //colors don't match the example
         color: otuIds,
-        colorscale: otuIds,
-             //top ten makes them all gray
-             // color: topTenIds,
-             // colorscale: topTenIds,
-        //color: otuIds.reverse(),
-        //colorscale: ,
+        // colorscale: otuIds, //can change this for fun
+        colorscale: "YlGnBu",  
+
       },
     };
 
     var bubbleData = [bubbleTrace];
 
-    // Sets the otu_ids as the x-axis values
-    // Sets the sample_values as the y-axis values
-    // Sets the otu_labels as the hover-text values
-    // Sets the sample_values as the marker size
-    // Sets the otu_ids as the marker colors
-
-
-
-
-
-    // To create the layout for the bubble chart in Step 2, add a title, a label for the x-axis, margins, 
-    // and the hovermode property. 
-    // The hovermode should show the text of the bubble on the chart when you hover near that bubble.
-
-    // Creates a title
-    // Creates a label for the x-axis
-    // The text for a bubble is shown when hovered over
-
     // 2. Create the layout for the bubble chart.
     var bubbleLayout = {
-      title: "Bacteria Cultures per Sample",
-      // xaxis.title: "IDs", //broke the page
-      //xaxis: "IDs", //didn't load bublle
+      title: "<b>Bacteria Cultures per Sample</b>",
       xaxis: otuIds,
-          // x axis formatting? Ah. They appear on hover
-
       hoverlabel: otuLabels,
-      
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "palegreen"
     };
 
     // 3. Use Plotly to plot the data with the layout.
- 
-    Plotly.newPlot("bubble", bubbleData, bubbleLayout);
+    Plotly.newPlot("bubble", bubbleData, bubbleLayout, {responsive: true});
+
+
+
+    //gauge chart plotting steps
     
+  ///  4. Create the trace for the gauge chart.
+    var gaugeTrace = {
+      type: "indicator",
+      mode: "gauge+number",
+      value: wfreq,
+      title: {text: "<b>Belly Button Washing Frequency</b><br>Scrubs per Week"},
+      gauge: {
+        axis: {range: [null, 10], tickwidth: 1, tickcolor: "darkblue" },
+        bar: {color: "darkblue" },
+        steps: [
+          {range: [0, 2], color: "darkolivegreen" },
+          {range: [2, 4], color: "olivedrab" },
+          {range: [4, 6], color: "yellowgreen" },
+          {range: [6, 8], color: "greenyellow"},
+          {range: [8, 10], color: "mediumspringgreen" },
+        ],
+      }
+    };
+
+    var gaugeData = [gaugeTrace];
+    
+    // 5. Create the layout for the gauge chart.
+    var gaugeLayout = { 
+      paper_bgcolor: "rgba(0,0,0,0)",
+      // width: 100%,
+      // height: 0,
+      // padding-bottom: 50%, 
+      // width: 600, 
+      // height: 500, 
+      //margin: { t: 0, b: 0 }
+    };
+
+    // 6. Use Plotly to plot the gauge data and layout.
+    Plotly.newPlot("gauge", gaugeData, gaugeLayout, {responsive: true});
+
 
 })};
 
